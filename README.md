@@ -1,59 +1,49 @@
-# AngularFirebaseAuthBoilerplate
+# Angular & Firebase Authentication Boilerplate
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.6.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.6.  
+A boilerplate project for setting up Firebase Authentication in an Angular Application.  
+This repo provides a ready-to-use authentication system with Firebase, including user sign-up, login, logout and password reset functionalities.
 
-## Development server
+## Features
 
-To start a local development server, run:
+1. Zoneless Angular v19 with Standalone Components
+2. Firebase Authentication ([Email / Password](https://firebase.google.com/docs/reference/rest/auth)) that uses the JWT pattern
+3. Secure Route Guard for Authenticated Users
 
-```bash
-ng serve
+## Getting Started
+
+### 1. Clone the Repository
+
+```sh
+git clone https://github.com/nickpolizogopoulos/angular-firebase-auth-boilerplate.git my-angular-firebase-auth-project
+cd my-angular-firebase-auth-project
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### 2. Install Dependencies
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```sh
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### 3. Setup Firebase
 
-```bash
-ng generate --help
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project & enable Authentication (Email / Password)
+3. Get your Firebase Web API Key from **Project Settings** → **General**
+4. Add it in your "firebaseApiKey" in your environment.
+5. Set your localStorage Key property value in the Auth Service.
+
+### 4. Run the Project
+
+```sh
+npm start
 ```
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
+OR  
+```sh
+ng serve --open
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## License
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+This project is open-source under the **MIT License**.  

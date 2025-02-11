@@ -1,1 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 100;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    padding: .3rem .5rem;
+    border-radius: .3rem;
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+a {
+    color: inherit;
+}

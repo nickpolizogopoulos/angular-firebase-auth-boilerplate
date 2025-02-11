@@ -1,12 +1,36 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AuthService } from './pages/auth/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  standalone: true,
+  imports: [
+    RouterOutlet
+  ],
+  template: `
+  
+    <router-outlet />
+  
+  `,
 })
-export class AppComponent {
-  title = 'angular-firebase-auth-boilerplate';
+export class AppComponent implements OnInit {
+
+  private readonly authService = inject(AuthService);
+
+  ngOnInit(): void {
+    this.authService.autoLogin();
+  }
+
+  constructor() {
+    console.log(
+      `%cA boilerplate project for setting up Firebase Authentication in an Angular Application. This repo provides a ready-to-use authentication system with Firebase, including user sign-up, login, logout and password reset functionalities.`,
+      `font-size: 15px; font-weight: bold; color: green;`
+    );
+  }
+
 }
