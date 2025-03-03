@@ -16,6 +16,3 @@ export class User {
     }
     
 }
-
-//* Έχει tokenExpirationDate σε περίπτωση που πρέπει να υπάρχει
-//* λήξη του session για auto logout μετά απο κάποια ώρα.
