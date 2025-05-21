@@ -10,6 +10,8 @@ This repo provides a ready-to-use authentication system with Firebase, including
 2. Firebase Authentication ([Email / Password](https://firebase.google.com/docs/reference/rest/auth)) that uses the JWT pattern
 3. Secure Route Guard for Authenticated Users
 
+Get the [Docker Image](https://hub.docker.com/r/nickpolizogopoulos/angular-firebase-auth-boilerplate)
+
 ## Getting Started
 
 ### 1. Clone the Repository
