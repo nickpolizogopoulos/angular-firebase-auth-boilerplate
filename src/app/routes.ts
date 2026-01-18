@@ -3,8 +3,7 @@ import { authGuard } from './guards/auth-guard';
 
 import { Home } from './pages/home';
 import { Auth } from './pages/auth/auth';
-
-import { PasswordReset } from './pages/password-reset/password-reset';
+import { PasswordReset } from './pages/password-reset';
 import { PageNotFound } from './pages/page-not-found';
 
 const getAppTitle = (pageTitle?: string) => {

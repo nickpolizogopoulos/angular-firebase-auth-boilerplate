@@ -6,6 +6,13 @@
 /out-tsc
 /bazel-out
 
+# Virtual environments
+.env/
+.venv/
+venv/
+env/
+.env
+
 # Node
 /node_modules
 npm-debug.log
