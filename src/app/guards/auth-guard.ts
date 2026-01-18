@@ -10,7 +10,7 @@ import {
   take
 } from 'rxjs';
 
-import { AuthService } from './auth.service';
+import { AuthService } from '../services/auth';
 
 type AuthGuardType = Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree;
 

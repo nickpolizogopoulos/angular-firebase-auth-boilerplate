@@ -1,27 +1,24 @@
 import {
-    Injectable,
-    inject
-} from '@angular/core';
-import {
     HttpClient,
     HttpErrorResponse
 } from '@angular/common/http';
+import {
+    Injectable,
+    inject
+} from '@angular/core';
 import { Router } from '@angular/router';
 import {
-    Observable,
     BehaviorSubject,
+    Observable,
     catchError,
     tap,
     throwError
 } from 'rxjs';
 
-import { User } from './user.model';
-import { environment } from '../../../environments/environment.development';
+import { AuthResponse, UserData } from '../models/auth';
+import { User } from '../models/user';
 
-import {
-    type AuthResponseData,
-    type UserData
-} from './types';
+import { environment } from '../../environments/environment';
   
 @Injectable({
     providedIn: 'root'
@@ -42,12 +39,12 @@ export class AuthService {
     private readonly localStorageKey = 'angular-firebase-auth-boilerplate';
     private tokenExpirationTimer: any;
 
-    signup(email: string, password: string): Observable<AuthResponseData> {
+    signup(email: string, password: string): Observable<AuthResponse> {
 
         const payload = { email: email, password: password, returnSecureToken: true };
 
         return this.http
-            .post <AuthResponseData>(this.signUpUrl, payload)
+            .post <AuthResponse>(this.signUpUrl, payload)
             .pipe(
                 tap( responseData => 
                     this.handleAuthentication(
@@ -61,12 +58,12 @@ export class AuthService {
             );
     }
 
-    login(email: string, password: string): Observable<AuthResponseData> {
+    login(email: string, password: string): Observable<AuthResponse> {
 
         const payload = { email: email, password: password, returnSecureToken: true };
 
         return this.http
-            .post <AuthResponseData>( this.loginUrl, payload )
+            .post <AuthResponse>( this.loginUrl, payload )
             .pipe(
                 tap( responseData =>
                     this.handleAuthentication(

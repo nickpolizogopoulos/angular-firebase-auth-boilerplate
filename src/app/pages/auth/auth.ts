@@ -14,9 +14,9 @@ import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 
-import { LoadingSpinnerComponent } from '../../components/loading-spinner.component';
-import { AuthService } from './auth.service';
-import { AuthResponseData } from './types';
+import { LoadingSpinnerComponent } from '../../components/loading-spinner';
+import { AuthService } from '../../services/auth';
+import { AuthResponse } from '../../models/auth';
 
 @Component({
     selector: 'app-auth',
@@ -78,7 +78,7 @@ import { AuthResponseData } from './types';
         </div>
     `
 })
-export class AuthComponent implements OnInit {
+export class Auth implements OnInit {
 
     private authService = inject(AuthService);
     private router = inject(Router);
@@ -119,7 +119,7 @@ export class AuthComponent implements OnInit {
         const email = form.value.email;
         const password = form.value.password;
         
-        let authObservable: Observable<AuthResponseData>;
+        let authObservable: Observable<AuthResponse>;
 
         if (this.isLoginMode())
             authObservable = this.authService.login(email, password);

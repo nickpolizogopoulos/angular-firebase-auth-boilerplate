@@ -4,7 +4,7 @@ import {
   inject
 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthService } from './pages/auth/auth.service';
+import { AuthService } from '../app/services/auth';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +18,7 @@ import { AuthService } from './pages/auth/auth.service';
   
   `,
 })
-export class AppComponent implements OnInit {
+export class App implements OnInit {
 
   private readonly authService = inject(AuthService);
 

@@ -24,4 +24,4 @@ const savedInformation = window.localStorage.getItem(localStorageItemData);
 if (savedInformation) {
   const loadedFormData = JSON.parse(savedInformation);
   initialUsernameValue = loadedFormData.username;
-}
+};

@@ -1,17 +1,13 @@
-import {
-    Component,
-    inject
-} from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
-import { AuthService } from "./auth/auth.service";
+// import { AuthService } from "./auth/auth.service";
+import { AuthService } from "../services/auth";
 
 @Component({
     selector: 'app-page-not-found',
     standalone: true,
-    imports: [
-        RouterLink
-    ],
+    imports: [RouterLink],
     template: `
     
         <h1>You are logged in.</h1>
@@ -22,15 +18,13 @@ import { AuthService } from "./auth/auth.service";
             <button (click)="onLogout()">Logout</button>
             <button routerLink="password-reset">Password Reset</button>
         </div>
-
     `
 })
-export class HomeComponent {
+export class Home {
 
-    private authService = inject(AuthService);
+    readonly #authService = inject(AuthService);
 
-    onLogout(): void {
-        this.authService.logout();
+    protected onLogout(): void {
+        this.#authService.logout();
     }
-
 }

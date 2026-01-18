@@ -1,22 +1,22 @@
-import { 
+import {
     Component,
     DestroyRef,
     inject,
     signal
-  } from '@angular/core';
-  import {
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
     FormsModule,
     NgForm
-  } from '@angular/forms';
-  import {
+} from '@angular/forms';
+import {
     Router,
     RouterModule
-  } from '@angular/router';
-  import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-  
-  import { AuthService } from '../auth/auth.service';
-import { PasswordResetService } from './password-reset.service';
-import { LoadingSpinnerComponent } from "../../components/loading-spinner.component";
+} from '@angular/router';
+
+import { LoadingSpinnerComponent } from "../../components/loading-spinner";
+import { AuthService } from '../../services/auth';
+import { PasswordReset as PasswordResetService } from '../../services/password-reset';
   
   @Component({
     selector: 'app-password-reset',
@@ -61,7 +61,7 @@ import { LoadingSpinnerComponent } from "../../components/loading-spinner.compon
     
     `,
   })
-  export class PasswordResetComponent {
+  export class PasswordReset {
   
     private readonly router = inject(Router);
     private readonly destroyRef = inject(DestroyRef);

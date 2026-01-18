@@ -29,7 +29,6 @@ import { Component } from "@angular/core";
                 transform: rotate(360deg);
             }
         } 
-        
     `
 })
 export class LoadingSpinnerComponent{}
