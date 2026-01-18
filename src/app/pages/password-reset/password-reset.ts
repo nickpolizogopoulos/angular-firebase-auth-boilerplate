@@ -4,6 +4,7 @@ import {
     inject,
     signal
 } from '@angular/core';
+import { catchError, EMPTY, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
     FormsModule,
@@ -14,7 +15,7 @@ import {
     RouterModule
 } from '@angular/router';
 
-import { LoadingSpinnerComponent } from "../../components/loading-spinner";
+import { LoadingSpinner } from "../../components/loading-spinner";
 import { AuthService } from '../../services/auth';
 import { PasswordReset as PasswordResetService } from '../../services/password-reset';
   
@@ -22,96 +23,90 @@ import { PasswordReset as PasswordResetService } from '../../services/password-r
     selector: 'app-password-reset',
     standalone: true,
     imports: [
-    RouterModule,
-    FormsModule,
-    LoadingSpinnerComponent
-],
+        RouterModule,
+        FormsModule,
+        LoadingSpinner
+    ],
     template: `
 
-            @if (isLoading()) {
-                <h3 class="mb-3">Sending email...</h3>
-                <app-loading-spinner />
-            }
+        @if (isLoading()) {
+            <h3 class="mb-3">Sending email...</h3>
+            <app-loading-spinner />
+        }
 
-            @if (!isLoading() && !alert()) {
-                <h3>{{ isAuthenticated() ? 'Password Reset' : 'Find Your Account' }}</h3>
-                <p>Please enter your email address to reset your password.</p>
-                
-                <form #form="ngForm" (ngSubmit)="onSubmit(form)">
-                    @let emailIsInvalid = !email.valid && email.touched;
+        @if (!isLoading() && !alert()) {
+            <h3>{{ isAuthenticated() ? 'Password Reset' : 'Find Your Account' }}</h3>
+            <p>Please enter your email address to reset your password.</p>
+            
+            <form #form="ngForm" (ngSubmit)="onSubmit(form)">
+                @let emailIsInvalid = !email.valid && email.touched;
 
-                    <div>
-                        <input [class.is-invalid]="emailIsInvalid" type="text" placeholder="Email" name="email" #email="ngModel" required email ngModel>
-                        @if (emailIsInvalid) {
-                            <div>Email is required.</div>
-                        }
-                    </div>
-                    <div style="display: flex; gap: .4rem;">
-                        <button type="submit" [disabled]="!form.valid">Submit</button>
-                        <button routerLink="/">Cancel</button>
-                    </div>
-                </form>
-            }
+                <div>
+                    <input [class.is-invalid]="emailIsInvalid" type="text" placeholder="Email" name="email" #email="ngModel" required email ngModel>
+                    @if (emailIsInvalid) {
+                        <div>Email is required.</div>
+                    }
+                </div>
+                <div style="display: flex; gap: .4rem;">
+                    <button type="submit" [disabled]="!form.valid">Submit</button>
+                    <button routerLink="/">Cancel</button>
+                </div>
+            </form>
+        }
 
-            @if (alert()) {
-                <p>A password reset request has been sent, check your email!</p>
-                <p>Check your spam emails as well!</p>
-                <button routerLink="/">Back</button>
-            }
+        @if (alert()) {
+            <p>A password reset request has been sent, check your email!</p>
+            <p>Check your spam emails as well!</p>
+            <button routerLink="/">Back</button>
+        }
     
     `,
   })
   export class PasswordReset {
   
-    private readonly router = inject(Router);
-    private readonly destroyRef = inject(DestroyRef);
+    readonly #router = inject(Router);
+    readonly #destroyRef = inject(DestroyRef);
 
-    private readonly passReset = inject(PasswordResetService);
-    private readonly authService = inject(AuthService);
+    readonly #passResetService = inject(PasswordResetService);
+    readonly #authService = inject(AuthService);
     
-    isAuthenticated = signal<boolean>(false);
+    protected readonly isAuthenticated = signal<boolean>(false);
   
     ngOnInit(): void {
-      this.authService.user
+      this.#authService.user
         .pipe(
-            takeUntilDestroyed(this.destroyRef)
+            takeUntilDestroyed(this.#destroyRef)
         )
         .subscribe({
             next: user => this.isAuthenticated.set(!!user)
         });
     }
   
-    isLoading = signal<boolean>(false);
-    errorMessage = signal<string | null>(null);
-    alert = signal<boolean>(false);
+    protected readonly isLoading = signal<boolean>(false);
+    protected readonly errorMessage = signal<string | null>(null);
+    protected readonly alert = signal<boolean>(false);
   
-    onSubmit( form: NgForm ): void {
-  
+    onSubmit(form: NgForm): void {
         this.isLoading.set(true);
   
-        if (!form.valid)
-            return;
+        if (!form.valid) return;
     
         const email = form.value.email.toLowerCase();
     
-        this.passReset
+        this.#passResetService
             .reset(email)
             .pipe(
-                takeUntilDestroyed(this.destroyRef)
+                takeUntilDestroyed(this.#destroyRef),
+                catchError(error => {
+                    this.errorMessage.set(error)
+                    return EMPTY;
+                }),
+                finalize(() => this.isLoading.set(false))
             )
-            .subscribe({
-                next: () => {
-                    this.alert.set(true);
-                    setTimeout( 
-                        () => this.router.navigate(['/login']),
-                        4500
-                    );
-                },
-                error: responseError => this.errorMessage.set(responseError),
-                complete: () => this.isLoading.set(false)
+            .subscribe(() => {
+                this.alert.set(true);
+                setTimeout(() => this.#router.navigate(['/login']), 2400);
             });
-        
-        form.reset();
     }
   
     //* Errors do not work for now

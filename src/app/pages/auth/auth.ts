@@ -14,7 +14,7 @@ import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 
-import { LoadingSpinnerComponent } from '../../components/loading-spinner';
+import { LoadingSpinner } from '../../components/loading-spinner';
 import { AuthService } from '../../services/auth';
 import { AuthResponse } from '../../models/auth';
 
@@ -22,7 +22,7 @@ import { AuthResponse } from '../../models/auth';
     selector: 'app-auth',
     standalone: true,
     imports: [
-        LoadingSpinnerComponent,
+        LoadingSpinner,
         FormsModule,
         RouterLink
     ],

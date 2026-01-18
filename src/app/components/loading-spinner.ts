@@ -31,4 +31,4 @@ import { Component } from "@angular/core";
         } 
     `
 })
-export class LoadingSpinnerComponent{}
+export class LoadingSpinner {}
