@@ -83,19 +83,9 @@ export class Auth {
     protected readonly loading = signal<boolean>(false);
     protected readonly error = signal<string | null>(null);
 
-    readonly #authResult = signal<AuthResponse | null>(null);
-
     constructor() {
         if (this.#authService.isAuthenticated())
             this.#router.navigate(['/']);
-
-        effect(() => {
-            const response = this.#authResult();
-            if (!response) return;
-
-            this.error.set(null);
-            this.#router.navigate(['/']);
-        });
     };
 
     protected onSwitchModeAndCloseAlert(): void {
@@ -123,7 +113,7 @@ export class Auth {
         
         this.#authenticate(form.value.email, form.value.password)
             .pipe(
-                tap(response => this.#authResult.set(response)),
+                tap(() => this.#router.navigate(['/'])),
                 catchError(error => {
                     this.error.set(error);
                     return EMPTY;
