@@ -4,140 +4,112 @@ import {
 } from '@angular/common/http';
 import {
     Injectable,
-    inject
+    computed,
+    inject,
+    signal
 } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-    BehaviorSubject,
     Observable,
     catchError,
     tap,
     throwError
 } from 'rxjs';
 
-import { AuthResponse, UserData } from '../models/auth';
+import {
+    AuthRequest,
+    AuthResponse,
+    UserData
+} from '../models/auth';
+import { environment as env } from '../../environments/environment';
 import { User } from '../models/user';
-
-import { environment } from '../../environments/environment';
   
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
+    readonly #router = inject(Router);
+    readonly #http = inject(HttpClient);
 
-    user = new BehaviorSubject<User | null>(null);
+    readonly #user = signal<User | null>(null);
+    public readonly isAuthenticated = computed<boolean>(() => !!this.#user());
+    public readonly userEmail = computed<string>(() => this.#user()?.email ?? '');
 
-    private readonly router = inject(Router);
-    private readonly http = inject(HttpClient);
+    readonly #signUpUrl: string = `${env.apiUrl}${env.signUp}${env.firebaseApiKey}`;
+    readonly #loginUrl: string = `${env.apiUrl}${env.login}${env.firebaseApiKey}`;
+    readonly #localStorageKey = `${env.localStorageKey}`;
+    #tokenExpirationTimer: ReturnType<typeof setTimeout> | null = null;
 
-    private readonly signUpEndpoint: string = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=';
-    private readonly loginEndpoint: string = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=';
-    private readonly apiKey: string = environment.firebaseApiKey;
+    #getPayload(email: string, password: string): AuthRequest {
+        return {
+            email: email,
+            password: password,
+            returnSecureToken: true
+        };
+    };
 
-    private readonly signUpUrl: string = this.signUpEndpoint + this.apiKey;
-    private readonly loginUrl: string = this.loginEndpoint + this.apiKey;
-    private readonly localStorageKey = 'angular-firebase-auth-boilerplate';
-    private tokenExpirationTimer: any;
-
-    signup(email: string, password: string): Observable<AuthResponse> {
-
-        const payload = { email: email, password: password, returnSecureToken: true };
-
-        return this.http
-            .post <AuthResponse>(this.signUpUrl, payload)
+    public signup(email: string, password: string): Observable<AuthResponse> {
+        return this.#http
+            .post<AuthResponse>(this.#signUpUrl, this.#getPayload(email, password))
             .pipe(
-                tap( responseData => 
-                    this.handleAuthentication(
-                        responseData.email,
-                        responseData.localId,
-                        responseData.idToken,
-                        +responseData.expiresIn
-                    )
-                ),
-                catchError(this.handleError)
+                tap(res => this.#handleAuthentication(res.email, res.localId, res.idToken, +res.expiresIn)),
+                catchError(this.#handleError)
             );
-    }
+    };
 
-    login(email: string, password: string): Observable<AuthResponse> {
-
-        const payload = { email: email, password: password, returnSecureToken: true };
-
-        return this.http
-            .post <AuthResponse>( this.loginUrl, payload )
+    public login(email: string, password: string): Observable<AuthResponse> {
+        return this.#http
+            .post<AuthResponse>(this.#loginUrl, this.#getPayload(email, password))
             .pipe(
-                tap( responseData =>
-                    this.handleAuthentication(
-                        responseData.email,
-                        responseData.localId,
-                        responseData.idToken,
-                        +responseData.expiresIn
-                    )
-                ),
-                catchError(this.handleError)
+                tap(response => this.#handleAuthentication(response.email, response.localId, response.idToken, +response.expiresIn)),
+                catchError(this.#handleError)
             );
-    }
+    };
 
-    autoLogin(): void {
+    public autoLogin(): void {
+        const stored = localStorage.getItem(this.#localStorageKey);
+        if (!stored) return;
 
-        const userData: UserData = JSON.parse(localStorage.getItem(this.localStorageKey) as string);
-
-        if (!userData)
-            return;
+        const storedUser: UserData = JSON.parse(stored);
 
         const loadedUser = new User (
-            userData.email,
-            userData.id,
-            userData._token,
-            new Date(userData._tokenExpirationDate)
+            storedUser.email,
+            storedUser.id,
+            storedUser._token,
+            new Date(storedUser._tokenExpirationDate)
         );
 
         if (loadedUser.token) {
-            this.user.next(loadedUser);
-            this.autoLogout( new Date(userData._tokenExpirationDate).getTime() - new Date().getTime() );
-        }
+            this.#user.set(loadedUser);
+            this.#autoLogout(new Date(storedUser._tokenExpirationDate).getTime() - new Date().getTime());
+        };
+    };
 
-    }
+    public logout(): void {
+        this.#user.set(null);
+        this.#router.navigate(['/login']);
+        localStorage.removeItem(this.#localStorageKey);
 
-    logout(): void {
+        if (this.#tokenExpirationTimer)
+            clearTimeout(this.#tokenExpirationTimer);
 
-        this.user.next(null);
-        this.router.navigate(['/login']);
-        localStorage.removeItem(this.localStorageKey);
+        this.#tokenExpirationTimer = null;
+    };
 
-        if (this.tokenExpirationTimer)
-            clearTimeout(this.tokenExpirationTimer);
+    #autoLogout(expirationDuration: number): void {
+        this.#tokenExpirationTimer = setTimeout(() => this.logout(), expirationDuration);
+    };
 
-        this.tokenExpirationTimer = null;
+    #handleAuthentication(email: string, userId: string, token: string, expiresIn: number): void {
+        const expirationDate: Date = new Date(new Date().getTime() + expiresIn * 1000);
+        const user: User = new User(email, userId, token, expirationDate);
 
-    }
+        this.#user.set(user);
+        this.#autoLogout(expiresIn * 1000);
+        localStorage.setItem(this.#localStorageKey, JSON.stringify(user));
+    };
 
-    autoLogout( expirationDuration: number ): void {
-
-        this.tokenExpirationTimer = setTimeout(
-            () => this.logout(),
-            expirationDuration
-        );
-
-    }
-
-    private handleAuthentication(
-        email: string,
-        userId: string,
-        token: string,
-        expiresIn: number
-    ): void 
-    {
-        const expirationDate: Date = new Date( new Date().getTime() + expiresIn * 1000 );
-        const user: User = new User( email, userId, token, expirationDate);
-        
-        this.user.next(user);
-        this.autoLogout(expiresIn * 1000);
-        localStorage.setItem(this.localStorageKey, JSON.stringify(user));
-
-    }
-
-    private handleError( errorResponse: HttpErrorResponse ): Observable<never> {
-
+    #handleError( errorResponse: HttpErrorResponse ): Observable<never> {
         let errorMessage = 'An unknown error occured!';
 
         if (!errorResponse.error || !errorResponse.error.error)
@@ -160,8 +132,6 @@ export class AuthService {
         if (message === 'USER_DISABLED')
             errorMessage = 'This user account has been disabled by an administrator.';
 
-        return throwError( () => errorMessage );
-
-    }
-
+        return throwError(() => errorMessage);
+    };
 }

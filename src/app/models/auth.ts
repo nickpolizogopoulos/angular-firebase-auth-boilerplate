@@ -1,4 +1,9 @@
 
+export type AuthRequest = {
+    email: string;
+    password: string;
+    returnSecureToken: boolean;
+};
 
 export type AuthResponse = {
     idToken: string;
