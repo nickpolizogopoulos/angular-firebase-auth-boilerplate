@@ -3,6 +3,13 @@
 
 export const environment = {
     production: false,
-    passwordResetApiUrl: 'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=',
+    apiUrl: 'https://identitytoolkit.googleapis.com/v1/accounts',
+
+    passwordReset: ':sendOobCode?key=',
+    login: ':signInWithPassword?key=',
+    signUp: ':signUp?key=',
+
+    localStorageKey: 'angular-firebase-auth-boilerplate',
+
     firebaseApiKey: 'dev-firebase-project-key-here'
 };
