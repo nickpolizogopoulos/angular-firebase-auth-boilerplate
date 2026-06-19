@@ -32,10 +32,6 @@ export class AuthService {
     public readonly isAuthenticated = computed<boolean>(() => !!this.#user());
     public readonly userEmail = computed<string>(() => this.#user()?.email ?? '');
 
-
-    
-
-
     readonly #signUpUrl: string = `${env.apiUrl}${env.signUp}${env.firebaseApiKey}`;
     readonly #loginUrl: string = `${env.apiUrl}${env.login}${env.firebaseApiKey}`;
     readonly #localStorageKey = `${env.localStorageKey}`;

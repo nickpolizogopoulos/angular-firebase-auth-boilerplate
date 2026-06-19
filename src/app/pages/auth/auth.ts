@@ -27,14 +27,14 @@ import { AuthService } from '../../services/auth';
     ],
     template: `
 
-        @if (errorMessage()) {
+        @if (error()) {
             <div>
                 <h3>Error {{ isLoginMode() ? 'Logging in' : 'Signing up' }}:</h3>
-                <p class="text-error">{{ errorMessage() }}</p>
+                <p class="text-error">{{ error() }}</p>
                 <button (click)="onCloseAlert()">clear error</button>
             </div>
         }
-        @if (isLoading()) {
+        @if (loading()) {
             <h3>{{ isLoginMode() ? 'Logging in...' : 'Signing up...' }}</h3>
              <span loader></span>
         }
@@ -80,8 +80,8 @@ export class Auth {
     readonly #router = inject(Router);
 
     protected readonly isLoginMode = signal<boolean>(true);
-    protected readonly isLoading = signal<boolean>(false);
-    protected readonly errorMessage = signal<string | null>(null);
+    protected readonly loading = signal<boolean>(false);
+    protected readonly error = signal<string | null>(null);
 
     readonly #authResult = signal<AuthResponse | null>(null);
 
@@ -93,7 +93,7 @@ export class Auth {
             const response = this.#authResult();
             if (!response) return;
 
-            this.errorMessage.set(null);
+            this.error.set(null);
             this.#router.navigate(['/']);
         });
     };
@@ -109,36 +109,31 @@ export class Auth {
         this.form().reset();
     };
 
-    // * from service
-    // loading
-    // error
+    #authenticate(email: string, password: string): Observable<AuthResponse> {
+        return this.isLoginMode()
+            ? this.#authService.login(email, password)
+            : this.#authService.signup(email, password);
+    };
 
     public onSubmit(form: NgForm): void {
         if (!form.valid) return;
 
-        this.isLoading.set(true);
-        this.errorMessage.set(null);
-
-        const email = form.value.email;
-        const password = form.value.password;
+        this.loading.set(true);
+        this.error.set(null);
         
-        const auth$: Observable<AuthResponse> = this.isLoginMode()
-            ? this.#authService.login(email, password)
-            : this.#authService.signup(email, password);
-
-        auth$
+        this.#authenticate(form.value.email, form.value.password)
             .pipe(
                 tap(response => this.#authResult.set(response)),
                 catchError(error => {
-                    this.errorMessage.set(error);
+                    this.error.set(error);
                     return EMPTY;
                 }),
-                finalize(() => this.isLoading.set(false))
+                finalize(() => this.loading.set(false))
             )
             .subscribe();
     };
 
     protected onCloseAlert(): void {
-        this.errorMessage.set(null);
+        this.error.set(null);
     };
 }
