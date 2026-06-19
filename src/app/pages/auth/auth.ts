@@ -1,11 +1,6 @@
-import {
-    Component,
-    inject,
-    signal,
-    viewChild,
-    effect
-} from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { email, form, minLength, required, FormField } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import {
     catchError,
@@ -23,7 +18,8 @@ import { AuthService } from '../../services/auth';
     imports: [
         LoadingSpinner,
         FormsModule,
-        RouterLink
+        RouterLink,
+        FormField
     ],
     template: `
 
@@ -40,24 +36,31 @@ import { AuthService } from '../../services/auth';
         }
         @else {
             <h3>{{ isLoginMode() ? 'Login' : 'Sign Up' }}</h3>
-            <form #form="ngForm" (ngSubmit)="onSubmit(form)">
-                @let emailIsInvalid = !email.valid && email.touched;
-                @let passwordIsInvalid = !password.valid && password.touched;
-
+            <form (ngSubmit)="onSubmit()">
+                
+                @let email = form.email();
+                @let emailIsInvalid = email.invalid() && email.touched();
                 <div>
-                    <input [class.is-invalid]="emailIsInvalid" type="text" placeholder="Email" name="email" #email="ngModel" required email ngModel>
+                     <input [formField]="form.email" type="text" placeholder="Email" />
                     @if (emailIsInvalid) {
-                        <p class="form-error">Email is required.</p>
+                        @for (error of email.errors(); track error) {
+                            <p class="form-error">{{ error.message }}.</p>
+                        }
                     }
                 </div>
+
+                @let password = form.password();
+                @let passwordIsInvalid = password.invalid() && password.touched();
                 <div>
-                    <input [class.is-invalid]="passwordIsInvalid" type="password" placeholder="Password" name="password" #password="ngModel" required minlength="6" ngModel>
+                     <input [formField]="form.password" type="password" placeholder="Password" />
                     @if (passwordIsInvalid) {
-                        <p class="form-error">A password of at least 6 characters is required.</p>
+                        @for (error of password.errors(); track error) {
+                            <p class="form-error">{{ error.message }}.</p>
+                        }
                     }
                 </div>
                 <div>
-                    <button [disabled]="!form.valid" type="submit">
+                    <button [disabled]="form().invalid()" type="submit">
                         {{ isLoginMode() ? 'Login' : 'Sign Up' }}
                     </button>
                     <span class="text">
@@ -83,6 +86,15 @@ export class Auth {
     protected readonly loading = signal<boolean>(false);
     protected readonly error = signal<string | null>(null);
 
+    readonly #formModel = signal({ email: '', password: '' });
+
+    protected readonly form = form(this.#formModel, path => {
+        required(path.email, { message: 'Email is required' });
+        email(path.email, { message: 'Enter a valid email address' });
+        required(path.password, { message: 'Password is required' })
+        minLength(path.password, 6, { message: 'Password must be at least 6 characters long' })
+    });
+
     constructor() {
         if (this.#authService.isAuthenticated())
             this.#router.navigate(['/']);
@@ -93,25 +105,26 @@ export class Auth {
         this.onCloseAlert();
     };
 
-    private readonly form = viewChild.required<NgForm>('form');
     public onSwitchMode(): void {
         this.isLoginMode.update(value => !value);
         this.form().reset();
     };
 
-    #authenticate(email: string, password: string): Observable<AuthResponse> {
+    #authenticate(): Observable<AuthResponse> {
+        const { email, password } = this.form().value();
+
         return this.isLoginMode()
             ? this.#authService.login(email, password)
             : this.#authService.signup(email, password);
     };
 
-    public onSubmit(form: NgForm): void {
-        if (!form.valid) return;
+    public onSubmit(): void {
+        if (this.form().invalid()) return;
 
         this.loading.set(true);
         this.error.set(null);
         
-        this.#authenticate(form.value.email, form.value.password)
+        this.#authenticate()
             .pipe(
                 tap(() => this.#router.navigate(['/'])),
                 catchError(error => {
