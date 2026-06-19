@@ -2,24 +2,32 @@
     font-family: Arial, Helvetica, sans-serif;
     font-weight: 100;
 }
-
+a {
+    color: inherit;
+}
 form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
-
 button {
     cursor: pointer;
     border: none;
     padding: .3rem .5rem;
     border-radius: .3rem;
-
     &:disabled {
         cursor: not-allowed;
     }
 }
-
-a {
-    color: inherit;
+.text-green {
+    color: green;
+}
+.text-error {
+    color: red;
+    font-style: italic;
+    margin: 5px 0;
+}
+.form-error {
+    @extend .text-error;
+    font-size: .8rem;
 }

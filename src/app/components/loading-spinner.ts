@@ -1,12 +1,9 @@
 import { Component } from "@angular/core";
 
 @Component({
-    selector: 'app-loading-spinner',
+    selector: 'span[loader]',
     standalone: true,
-    template: `
-
-        <span class="loader"></span>
-    `,
+    template: '<span class="loader"></span>',
     styles: `
 
         .loader {
@@ -24,7 +21,6 @@ import { Component } from "@angular/core";
             0% {
                 transform: rotate(0deg);
             }
-
             100% {
                 transform: rotate(360deg);
             }

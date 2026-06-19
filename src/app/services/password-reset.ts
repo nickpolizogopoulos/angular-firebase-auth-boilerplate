@@ -12,7 +12,7 @@ import {
     throwError
 } from 'rxjs';
 
-import { environment } from '../../environments/environment.development';
+import { environment as env } from '../../environments/environment.development';
 
 @Injectable({
     providedIn: 'root'
@@ -20,16 +20,16 @@ import { environment } from '../../environments/environment.development';
 export class PasswordReset {
 
     readonly #http = inject(HttpClient);
-    readonly #resetUrl: string = `${environment.passwordResetApiUrl}${environment.firebaseApiKey}`;
+    readonly #resetUrl: string = `${env.apiUrl}${env.passwordReset}${env.firebaseApiKey}`;
 
-    reset(email: string): Observable<{email: string}> {
+    public reset(email: string): Observable<{email: string}> {
         const payload = { requestType:'PASSWORD_RESET',  email: email };
         return this.#http
             .post<{email: string}>(this.#resetUrl, payload)
             .pipe(catchError(this.#handleError));
     };
 
-    #handleError( errorResponse: HttpErrorResponse ): Observable<never> {
+    #handleError(errorResponse: HttpErrorResponse): Observable<never> {
         let errorMessage = 'An unknown error occured!';
 
         if (!errorResponse.error || !errorResponse.error.error)
