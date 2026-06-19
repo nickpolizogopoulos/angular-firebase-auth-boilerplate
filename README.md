@@ -1,14 +1,14 @@
 # Angular & Firebase Authentication Boilerplate
 
-This project uses the latest version of [Angular CLI](https://github.com/angular/angular-cli) version 21.1.0.  
+This project uses the latest version of [Angular CLI](https://github.com/angular/angular-cli) version 22.0.2.  
 A boilerplate project for setting up Firebase Authentication in an Angular Application.  
 This repo provides a ready-to-use authentication system with Firebase, including user sign-up, login, logout and password reset functionalities.
 
 ## Features
 
-1. Zoneless Angular v21.1 with Standalone Components and Signals!
+1. Modern Angular v22 
 2. Firebase Authentication ([Email / Password](https://firebase.google.com/docs/reference/rest/auth)) that uses the JWT pattern
-3. Secure Route Guard for Authenticated Users
+3. Secure Route Guards for Authenticated and Unauthenticated Users
 
 Get the [Docker Image](https://hub.docker.com/r/nickpolizogopoulos/angular-firebase-auth-boilerplate)
 
