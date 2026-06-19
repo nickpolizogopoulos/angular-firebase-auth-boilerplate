@@ -13,7 +13,7 @@ export class App {
 
   constructor() {
     this.#authService.autoLogin();
-    console.log(`%cAngular v21.1.0`,`font-size: 15px; font-weight: bold; color: orangered;`);
+    console.log(`%cAngular v22.0.2`,`font-size: 15px; font-weight: bold; color: orangered;`);
     console.log(
       '%cA boilerplate project for setting up Firebase Authentication in an Angular Application. This repo provides a ready-to-use authentication system with Firebase, including user sign-up, login, logout and password reset functionalities.',
       'font-size: 15px; font-weight: bold; color: green;'

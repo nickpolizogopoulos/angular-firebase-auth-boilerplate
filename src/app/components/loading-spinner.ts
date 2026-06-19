@@ -2,7 +2,6 @@ import { Component } from "@angular/core";
 
 @Component({
     selector: 'span[loader]',
-    standalone: true,
     template: '<span class="loader"></span>',
     styles: `
 

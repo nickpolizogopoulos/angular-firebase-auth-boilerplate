@@ -1,7 +1,4 @@
-import {
-    HttpClient,
-    HttpErrorResponse
-} from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {
     Injectable,
     computed,
@@ -34,6 +31,10 @@ export class AuthService {
     readonly #user = signal<User | null>(null);
     public readonly isAuthenticated = computed<boolean>(() => !!this.#user());
     public readonly userEmail = computed<string>(() => this.#user()?.email ?? '');
+
+
+    
+
 
     readonly #signUpUrl: string = `${env.apiUrl}${env.signUp}${env.firebaseApiKey}`;
     readonly #loginUrl: string = `${env.apiUrl}${env.login}${env.firebaseApiKey}`;

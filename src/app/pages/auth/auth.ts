@@ -5,14 +5,8 @@ import {
     viewChild,
     effect
 } from '@angular/core';
-import {
-    FormsModule,
-    NgForm
-} from '@angular/forms';
-import {
-    Router,
-    RouterLink
-} from '@angular/router';
+import { FormsModule, NgForm } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import {
     catchError,
     EMPTY,
@@ -20,14 +14,12 @@ import {
     Observable,
     tap
 } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 import { LoadingSpinner } from '../../components/loading-spinner';
 import { AuthResponse } from '../../models/auth';
 import { AuthService } from '../../services/auth';
 
 @Component({
-    standalone: true,
     imports: [
         LoadingSpinner,
         FormsModule,
@@ -117,6 +109,10 @@ export class Auth {
         this.form().reset();
     };
 
+    // * from service
+    // loading
+    // error
+
     public onSubmit(form: NgForm): void {
         if (!form.valid) return;
 
@@ -142,7 +138,7 @@ export class Auth {
             .subscribe();
     };
 
-    onCloseAlert(): void {
+    protected onCloseAlert(): void {
         this.errorMessage.set(null);
     };
 }

@@ -4,7 +4,6 @@ import { RouterLink } from "@angular/router";
 import { AuthService } from "../services/auth";
 
 @Component({
-    standalone: true,
     imports: [RouterLink],
     template: `
     

@@ -18,14 +18,13 @@ import { environment as env } from '../../environments/environment.development';
     providedIn: 'root'
 })
 export class PasswordReset {
-
     readonly #http = inject(HttpClient);
     readonly #resetUrl: string = `${env.apiUrl}${env.passwordReset}${env.firebaseApiKey}`;
 
-    public reset(email: string): Observable<{email: string}> {
+    public reset(email: string): Observable<{ email: string }> {
         const payload = { requestType:'PASSWORD_RESET',  email: email };
         return this.#http
-            .post<{email: string}>(this.#resetUrl, payload)
+            .post<{ email: string }>(this.#resetUrl, payload)
             .pipe(catchError(this.#handleError));
     };
 

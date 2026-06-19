@@ -23,7 +23,6 @@ import { AuthService } from '../services/auth';
 import { PasswordReset as PasswordResetService } from '../services/password-reset';
   
 @Component({
-    standalone: true,
     imports: [
         RouterModule,
         FormsModule,
