@@ -1,10 +1,7 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './guards/auth-guard';
 
-import { Home } from './pages/home';
-import { Auth } from './pages/auth/auth';
-import { PasswordReset } from './pages/password-reset';
-import { PageNotFound } from './pages/page-not-found';
+import { authGuard } from './guards/auth-guard';
+import { unauthGuard } from './guards/unauth-guard';
 
 const getAppTitle = (pageTitle?: string) => {
     const appTitle = 'Angular & Firebase Auth';
@@ -14,23 +11,24 @@ const getAppTitle = (pageTitle?: string) => {
 export const routes: Routes = [
     { 
         path: '', 
-        component: Home,
+        loadComponent: () => import('../app/pages/home').then(module => module.Home),
         canActivate: [authGuard],
         title: getAppTitle('Home')
     },
     { 
         path: 'login', 
-        component: Auth,
+        loadComponent: () => import('../app/pages/auth/auth').then(module => module.Auth),
+        canActivate: [unauthGuard],
         title: getAppTitle('Login')
     },
     { 
         path: 'password-reset', 
-        component: PasswordReset,
+        loadComponent: () => import('../app/pages/password-reset').then(module => module.PasswordReset),
         title: getAppTitle('Password Reset')
     },
     { 
         path: '404',
-        component: PageNotFound,
+        loadComponent: () => import('../app/pages/page-not-found').then(module => module.PageNotFound),
         title: getAppTitle('404')
     },
     { 

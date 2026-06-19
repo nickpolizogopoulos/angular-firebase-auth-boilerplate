@@ -95,11 +95,6 @@ export class Auth {
         minLength(path.password, 6, { message: 'Password must be at least 6 characters long' })
     });
 
-    constructor() {
-        if (this.#authService.isAuthenticated())
-            this.#router.navigate(['/']);
-    };
-
     protected onSwitchModeAndCloseAlert(): void {
         this.onSwitchMode();
         this.onCloseAlert();
