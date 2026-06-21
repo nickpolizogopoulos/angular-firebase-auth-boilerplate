@@ -2,14 +2,12 @@
 //* PRODUCTION
 
 export const environment = {
-    production: false,
-    apiUrl: 'https://identitytoolkit.googleapis.com/v1/accounts',
-
-    passwordReset: ':sendOobCode?key=',
-    login: ':signInWithPassword?key=',
-    signUp: ':signUp?key=',
-
+    production: true,
     localStorageKey: 'angular-firebase-auth-boilerplate',
     
-    firebaseApiKey: 'prod-firebase-project-key-here',
+    signUpUrl: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=`,
+    loginUrl: 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=',
+    passwordResetUrl: 'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=',
+    
+    firebaseApiKey: 'prod-firebase-project-key-here'
 };

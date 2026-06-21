@@ -1,30 +1,22 @@
-import {
-    HttpClient,
-    HttpErrorResponse
-} from '@angular/common/http';
-import {
-    Injectable,
-    inject
-} from '@angular/core';
-import {
-    Observable,
-    catchError,
-    throwError
-} from 'rxjs';
+import { Service, inject } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, catchError, throwError } from 'rxjs';
 
 import { environment as env } from '../../environments/environment.development';
 
-@Injectable({
-    providedIn: 'root'
-})
+type PassResetResponse = {
+    email: string
+};
+
+@Service()
 export class PasswordReset {
     readonly #http = inject(HttpClient);
-    readonly #resetUrl: string = `${env.apiUrl}${env.passwordReset}${env.firebaseApiKey}`;
+    readonly #resetUrl: string = `${env.passwordResetUrl}${env.firebaseApiKey}`;
 
-    public reset(email: string): Observable<{ email: string }> {
-        const payload = { requestType:'PASSWORD_RESET',  email: email };
+    public reset(email: string): Observable<PassResetResponse> {
+        const payload = { requestType:'PASSWORD_RESET', email };
         return this.#http
-            .post<{ email: string }>(this.#resetUrl, payload)
+            .post<PassResetResponse>(this.#resetUrl, payload)
             .pipe(catchError(this.#handleError));
     };
 

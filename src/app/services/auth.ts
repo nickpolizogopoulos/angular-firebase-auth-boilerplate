@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {
-    Injectable,
+    Service,
     computed,
     inject,
     signal
@@ -14,16 +14,14 @@ import {
 } from 'rxjs';
 
 import {
-    AuthRequest,
-    AuthResponse,
-    UserData
+    type AuthRequest,
+    type AuthResponse,
+    type UserData
 } from '../models/auth';
 import { environment as env } from '../../environments/environment';
 import { User } from '../models/user';
-  
-@Injectable({
-    providedIn: 'root'
-})
+
+@Service()
 export class AuthService {
     readonly #router = inject(Router);
     readonly #http = inject(HttpClient);
@@ -32,15 +30,15 @@ export class AuthService {
     public readonly isAuthenticated = computed<boolean>(() => !!this.#user());
     public readonly userEmail = computed<string>(() => this.#user()?.email ?? '');
 
-    readonly #signUpUrl: string = `${env.apiUrl}${env.signUp}${env.firebaseApiKey}`;
-    readonly #loginUrl: string = `${env.apiUrl}${env.login}${env.firebaseApiKey}`;
+    readonly #signUpUrl: string = `${env.signUpUrl}${env.firebaseApiKey}`;
+    readonly #loginUrl: string = `${env.loginUrl}${env.firebaseApiKey}`;
     readonly #localStorageKey = `${env.localStorageKey}`;
     #tokenExpirationTimer: ReturnType<typeof setTimeout> | null = null;
 
     #getPayload(email: string, password: string): AuthRequest {
         return {
-            email: email,
-            password: password,
+            email,
+            password,
             returnSecureToken: true
         };
     };
@@ -58,7 +56,7 @@ export class AuthService {
         return this.#http
             .post<AuthResponse>(this.#loginUrl, this.#getPayload(email, password))
             .pipe(
-                tap(response => this.#handleAuthentication(response.email, response.localId, response.idToken, +response.expiresIn)),
+                tap(res => this.#handleAuthentication(res.email, res.localId, res.idToken, +res.expiresIn)),
                 catchError(this.#handleError)
             );
     };
@@ -106,7 +104,7 @@ export class AuthService {
         localStorage.setItem(this.#localStorageKey, JSON.stringify(user));
     };
 
-    #handleError( errorResponse: HttpErrorResponse ): Observable<never> {
+    #handleError(errorResponse: HttpErrorResponse): Observable<never> {        
         let errorMessage = 'An unknown error occured!';
 
         if (!errorResponse.error || !errorResponse.error.error)
